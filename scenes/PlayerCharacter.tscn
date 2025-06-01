@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1y64c01f5kh7"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_24f1h"]
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+editor_description = "I wanna be the guy too!"
+sprite_frames = SubResource("SpriteFrames_24f1h")
