@@ -14,3 +14,14 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# Visual Studio Crap
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build files
+bin/
+obj/

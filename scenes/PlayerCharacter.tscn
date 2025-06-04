@@ -1,9 +1,37 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1y64c01f5kh7"]
+[gd_scene load_steps=6 format=3 uid="uid://b1y64c01f5kh7"]
+
+[ext_resource type="Texture2D" uid="uid://bclx0ql6gntq2" path="res://assets/sprites/Player/Idle/PlayerCharacter_test.png" id="1_cij07"]
+[ext_resource type="Script" uid="uid://c2g0qg2vlrag" path="res://scripts/Player/PlayerCharacter.cs" id="1_samq8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_samq8"]
+atlas = ExtResource("1_cij07")
+region = Rect2(0, 0, 32, 45)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_24f1h"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_cij07")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_samq8")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}]
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_24f1h"]
+size = Vector2(22, 44)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_samq8")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "I wanna be the guy too!"
 sprite_frames = SubResource("SpriteFrames_24f1h")
+animation = &"Idle"
+autoplay = "Idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_24f1h")
