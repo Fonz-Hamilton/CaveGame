@@ -5,37 +5,74 @@ public partial class PlayerCharacter : CharacterBody2D
 {
     [Export]
     public float Speed = 300.0f;
-	public const float JumpVelocity = -400.0f;
+	[Export]
+	public float JumpVelocity = -400.0f;
+	private AnimatedSprite2D _animatedSprite;
+	private Vector2 _direction;
+	private Vector2 _velocity;
+	private bool _isOnFloor; 
 
+    public override void _Ready() {
+        _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+    }
+
+    public override void _Process(double delta) {
+		HandleSpriteDirection();
+		HandleAnimation();
+		
+    }
 	public override void _PhysicsProcess(double delta)
 	{
-		Vector2 velocity = Velocity;
+		_velocity = Velocity;
 
 		// Add the gravity.
 		if (!IsOnFloor())
 		{
-			velocity += GetGravity() * (float)delta;
+			_velocity += GetGravity() * (float)delta;
 		}
 
 		// Handle Jump.
-		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+		if (Input.IsActionJustPressed("jump") && IsOnFloor())
 		{
-			velocity.Y = JumpVelocity;
+			_velocity.Y = JumpVelocity;
 		}
 
 		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
-		Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-		if (direction != Vector2.Zero)
+		// -1, 0, 1
+		_direction = Input.GetVector("move_left", "move_right", "ui_up", "ui_down");
+		if (_direction != Vector2.Zero)
 		{
-			velocity.X = direction.X * Speed;
+			_velocity.X = _direction.X * Speed;
 		}
 		else
 		{
-			velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
+			_velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
 		}
 
-		Velocity = velocity;
+		Velocity = _velocity;
 		MoveAndSlide();
+	}
+
+	private void HandleSpriteDirection() {
+
+		if(_direction.X > 0) {
+			_animatedSprite.FlipH = false;
+		}
+		else if (_direction.X < 0) {
+			_animatedSprite.FlipH = true;
+		}
+	}
+
+	private void HandleAnimation() {
+		_isOnFloor = IsOnFloor();
+		if(!_isOnFloor) {
+			_animatedSprite.Play("fall");
+		}
+        else if (_velocity.X != 0 && _isOnFloor) {
+			_animatedSprite.Play("walk");
+		}
+		else {
+			_animatedSprite.Play("idle");
+		}
 	}
 }
