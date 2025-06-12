@@ -3,22 +3,210 @@
 [ext_resource type="PackedScene" uid="uid://b1y64c01f5kh7" path="res://scenes/PlayerCharacter.tscn" id="1_o5qli"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o5qli"]
-size = Vector2(465, 20)
+size = Vector2(464.359, 9.4211)
 
 [node name="Main" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_o5qli")]
-position = Vector2(199, 107)
+position = Vector2(222, 89)
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2(0, 3)
 zoom = Vector2(2, 2)
+position_smoothing_enabled = true
 
 [node name="Line2D" type="Line2D" parent="."]
-points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+points = PackedVector2Array(-179, 148, 19, 148, 285, 148)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Line2D"]
 disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D/StaticBody2D"]
 position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D2" type="Line2D" parent="."]
+position = Vector2(461, 93)
+points = PackedVector2Array(-178, 149, 22, 149, 284, 148)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D2"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D2/StaticBody2D"]
+position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D3" type="Line2D" parent="."]
+position = Vector2(-461, 76)
+points = PackedVector2Array(-180, 143, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D3"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D3/StaticBody2D"]
+position = Vector2(58, 143)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D3" type="Line2D" parent="Line2D3"]
+position = Vector2(-453, -63)
+points = PackedVector2Array(-177, 148, 21, 148, 282, 148)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D3/Line2D3"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D3/Line2D3/StaticBody2D"]
+position = Vector2(52.5336, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D4" type="Line2D" parent="."]
+position = Vector2(913, 243)
+points = PackedVector2Array(-177, 148, 21, 149, 282, 148)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D4"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D4/StaticBody2D"]
+position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D5" type="Line2D" parent="."]
+position = Vector2(1403, 532)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D5"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D5/StaticBody2D"]
+position = Vector2(52.5, 144)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D6" type="Line2D" parent="."]
+position = Vector2(1896, 460)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D6"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D6/StaticBody2D"]
+position = Vector2(52.5, 144)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D7" type="Line2D" parent="."]
+position = Vector2(2399, 392)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D7"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D7/StaticBody2D"]
+position = Vector2(52.5, 144)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D8" type="Line2D" parent="."]
+position = Vector2(2892, 325)
+points = PackedVector2Array(-179, 148, 21, 148, 283, 148)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D8"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D8/StaticBody2D"]
+position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D9" type="Line2D" parent="."]
+position = Vector2(3368, 255)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D9"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D9/StaticBody2D"]
+position = Vector2(52.5, 144)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D10" type="Line2D" parent="."]
+position = Vector2(2447.9, -83.8058)
+scale = Vector2(5.87907, 1.92082)
+points = PackedVector2Array(-181, 144, 20, 144, 283.394, 143.782)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D10"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D10/StaticBody2D"]
+position = Vector2(51.215, 144.264)
+scale = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D11" type="Line2D" parent="."]
+position = Vector2(1019.25, -76.2804)
+scale = Vector2(1.31546, 1.38557)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D11"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D11/StaticBody2D"]
+position = Vector2(52.5001, 144.187)
+scale = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D12" type="Line2D" parent="."]
+position = Vector2(-28, 175)
+rotation = 1.56837
+scale = Vector2(0.17663, 1)
+points = PackedVector2Array(-171.825, 143.927, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D12"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D12/StaticBody2D"]
+position = Vector2(60.2982, 144.026)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D13" type="Line2D" parent="."]
+position = Vector2(-493, 184)
+rotation = 1.56837
+scale = Vector2(0.153901, 1)
+points = PackedVector2Array(-181, 144, 20, 144, 284, 143)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D13"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D13/StaticBody2D"]
+position = Vector2(71.4201, 144.017)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D14" type="Line2D" parent="."]
+position = Vector2(3846, 182)
+points = PackedVector2Array(-179, 147, 20, 147, 284, 147)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D14"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D14/StaticBody2D"]
+position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D15" type="Line2D" parent="."]
+position = Vector2(4311, 113)
+points = PackedVector2Array(-180, 147, 18, 148, 284, 147)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D15"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D15/StaticBody2D"]
+position = Vector2(52.5, 148)
+shape = SubResource("RectangleShape2D_o5qli")
+
+[node name="Line2D16" type="Line2D" parent="."]
+position = Vector2(510.801, -136)
+scale = Vector2(0.941369, 1.38557)
+points = PackedVector2Array(-176.128, 143.624, 65.0102, 144.345, 280.654, 144.345)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Line2D16"]
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D16/StaticBody2D"]
+position = Vector2(52.5001, 144.187)
+scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_o5qli")
