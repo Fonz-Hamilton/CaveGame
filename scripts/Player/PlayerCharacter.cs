@@ -3,10 +3,17 @@ using System;
 
 public partial class PlayerCharacter : CharacterBody2D
 {
-    [Export]
-    public float Speed = 300.0f;
+
 	[Export]
+	public float Sprint = 150.0f;
+	[Export]
+    public float BaseSpeed = 75.0f;
+    [Export]
 	public float JumpVelocity = -400.0f;
+    [Export]
+    public float Speed = 75.0f;
+    
+
 	private AnimatedSprite2D _animatedSprite;
 	private Vector2 _direction;
 	private Vector2 _velocity;
@@ -26,26 +33,22 @@ public partial class PlayerCharacter : CharacterBody2D
 		_velocity = Velocity;
 
 		// Add the gravity.
-		if (!IsOnFloor())
-		{
+		if (!IsOnFloor()) {
 			_velocity += GetGravity() * (float)delta;
 		}
 
 		// Handle Jump.
-		if (Input.IsActionJustPressed("jump") && IsOnFloor())
-		{
+		if (Input.IsActionJustPressed("jump") && IsOnFloor()) {
 			_velocity.Y = JumpVelocity;
 		}
 
 		// Get the input direction and handle the movement/deceleration.
 		// -1, 0, 1
 		_direction = Input.GetVector("move_left", "move_right", "ui_up", "ui_down");
-		if (_direction != Vector2.Zero)
-		{
-			_velocity.X = _direction.X * Speed;
+		if (_direction != Vector2.Zero) {
+			_velocity.X = _direction.X * (Speed);
 		}
-		else
-		{
+		else {
 			_velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
 		}
 
@@ -68,11 +71,17 @@ public partial class PlayerCharacter : CharacterBody2D
 		if(!_isOnFloor) {
 			_animatedSprite.Play("fall");
 		}
-        else if (_velocity.X != 0 && _isOnFloor) {
+        else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
 			_animatedSprite.Play("walk");
+			Speed = BaseSpeed;
 		}
+		else if(_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
+            _animatedSprite.Play("run");
+			Speed = Sprint;
+        }
 		else {
 			_animatedSprite.Play("idle");
-		}
+			Speed = BaseSpeed;
+        }
 	}
 }
