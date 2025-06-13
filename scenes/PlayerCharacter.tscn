@@ -1,14 +1,42 @@
-[gd_scene load_steps=40 format=3 uid="uid://b1y64c01f5kh7"]
+[gd_scene load_steps=47 format=3 uid="uid://b1y64c01f5kh7"]
 
 [ext_resource type="Script" uid="uid://c2g0qg2vlrag" path="res://scripts/Player/PlayerCharacter.cs" id="1_samq8"]
+[ext_resource type="Texture2D" uid="uid://c13smauhdr20f" path="res://assets/sprites/Player/jump/PlayerCharacter_Moving_Jump_test1-Sheet.png" id="2_bjtiv"]
 [ext_resource type="Texture2D" uid="uid://1vdreuw02o2y" path="res://assets/sprites/Player/Idle/Idle-Sheet.png" id="2_samq8"]
-[ext_resource type="Texture2D" uid="uid://dg6giyr51klvh" path="res://assets/sprites/Player/fall/PlayerCharacter_fall-Sheet.png" id="2_w4u4s"]
 [ext_resource type="Texture2D" uid="uid://cxw20u7kilo05" path="res://assets/sprites/Player/run/PlayerCharacter_run_current-Sheet.png" id="4_8dtrg"]
 [ext_resource type="Texture2D" uid="uid://c2a2tq5ccwxlb" path="res://assets/sprites/Player/walk/PlayerCharacter_walk-Sheet.png" id="4_bjtiv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_05nc0"]
-atlas = ExtResource("2_w4u4s")
-region = Rect2(0, 0, 32, 45)
+atlas = ExtResource("2_bjtiv")
+region = Rect2(0, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b4j4j"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(34, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wwnqw"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(68, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_egvsh"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(102, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cr13e"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(136, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_66pbp"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(170, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ckx2o"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(204, 0, 34, 45)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iw1ek"]
+atlas = ExtResource("2_bjtiv")
+region = Rect2(238, 0, 34, 45)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_kn48b"]
 atlas = ExtResource("2_samq8")
@@ -139,10 +167,31 @@ animations = [{
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_05nc0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b4j4j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wwnqw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_egvsh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cr13e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_66pbp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckx2o")
+}, {
+"duration": 10.0,
+"texture": SubResource("AtlasTexture_iw1ek")
 }],
 "loop": true,
 "name": &"fall",
-"speed": 5.0
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -262,10 +311,8 @@ script = ExtResource("1_samq8")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "I wanna be the guy too!"
 sprite_frames = SubResource("SpriteFrames_24f1h")
-animation = &"run"
+animation = &"fall"
 autoplay = "idle"
-frame = 7
-frame_progress = 0.443915
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 2)
