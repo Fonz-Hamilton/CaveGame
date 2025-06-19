@@ -1,20 +1,25 @@
-#### 2D game where you explore a cave/hole
+### 2D game where you explore a cave/hole
 
 For practicing Godot
 
-## Currently Working on: Test animations:
+#### Currently Working on: Test animations:
+
 
 ~~Idle Animation~~
 ~~Walk Animation~~
 ~~Run Animation~~
 ~~Basic Camera Follow~~
 
-# In Progress:
+
+##### In Progress:
+
 
 Moving Jump Animation
 Standing Jump Animation
 
-# TODO: Animations/Code
+
+##### TODO: Animations/Code
+
 
 Death Animation
 Wall kick
@@ -24,4 +29,7 @@ Roll
 Duck
 Run/Stop Transitions
 
-# - Fonz Hamilton
+
+---
+
+\- Fonz Hamilton
