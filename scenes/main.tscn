@@ -134,7 +134,6 @@ disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D10/StaticBody2D"]
 position = Vector2(51.215, 144.264)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D11" type="Line2D" parent="."]
@@ -147,7 +146,6 @@ disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D11/StaticBody2D"]
 position = Vector2(52.5001, 144.187)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D12" type="Line2D" parent="."]
@@ -208,7 +206,6 @@ disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D16/StaticBody2D"]
 position = Vector2(52.5001, 144.187)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D17" type="Line2D" parent="."]
