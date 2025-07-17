@@ -3,7 +3,7 @@ using System;
 
 public partial class PlayerCharacter : CharacterBody2D
 {
-
+	
 	[Export]
 	public float Sprint = 150.0f;
 	[Export]
@@ -68,20 +68,21 @@ public partial class PlayerCharacter : CharacterBody2D
 
 	private void HandleAnimation() {
 		_isOnFloor = IsOnFloor();
-		if(!_isOnFloor) {
+        
+		if (!_isOnFloor && _animatedSprite.Animation != "fall") {
 			_animatedSprite.Play("fall");
 		}
-        else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
+		else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
 			_animatedSprite.Play("walk");
 			Speed = BaseSpeed;
 		}
-		else if(_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
-            _animatedSprite.Play("run");
+		else if (_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
+			_animatedSprite.Play("run");
 			Speed = Sprint;
-        }
-		else {
+		}
+		else if (_velocity.X == 0 && _isOnFloor) {
 			_animatedSprite.Play("idle");
 			Speed = BaseSpeed;
-        }
+		}
 	}
 }
