@@ -9,21 +9,24 @@ For practicing Godot
 - ~~Walk Animation~~
 - ~~Run Animation~~
 - ~~Basic Camera Follow~~
-
+- ~~Moving Jump Animation~~
+- ~~Standing Jump Animation~~
+- ~~Death Animation (not good but usuable)~~
+- ~~Dead Hang (not good but usable)~~
+- ~~Cat Hang (not good but usable)~~
 
 ##### In Progress:
 
 
-- Moving Jump Animation
-- Standing Jump Animation
+- Coding Jump
+- Coding Death
+- Coding Hang
 
 
 ##### TODO: Animations/Code
 
 
-- Death Animation
 - Wall kick
-- Hang/Climb(Dead Hang/Active Hang, Cat Hang)
 - Dust Particles
 - Roll
 - Duck
