@@ -2,7 +2,7 @@
 
 For practicing Godot
 
-#### Currently Working on: Test animations:
+#### Currently Working on: Coding Basic Test Animations:
 
 
 - ~~Idle Animation~~
