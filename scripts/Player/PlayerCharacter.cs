@@ -12,12 +12,34 @@ public partial class PlayerCharacter : CharacterBody2D
 	public float JumpVelocity = -400.0f;
     [Export]
     public float Speed = 75.0f;
-    
 
-	private AnimatedSprite2D _animatedSprite;
+    enum PlayerState {
+        Idle,
+        Walk,
+        Run,
+        Jump,
+        LongJump,
+        Fall,
+        DeadHang,
+        CatHang,
+        Death
+    }
+
+    private AnimatedSprite2D _animatedSprite;
 	private Vector2 _direction;
 	private Vector2 _velocity;
-	private bool _isOnFloor; 
+	
+	private bool _isOnFloor;
+
+	private PlayerState _state = PlayerState.Idle;
+	private String _currentAnim = "";
+
+    private float _fallStartY = 0;
+    private float _fallDistanceThreshold = 200f;
+    private bool _wasOnFloor = false;
+	private bool _isDead = false;
+
+
 
     public override void _Ready() {
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
@@ -25,13 +47,15 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public override void _Process(double delta) {
 		HandleSpriteDirection();
+		UpdateState();
 		HandleAnimation();
 		
     }
 	public override void _PhysicsProcess(double delta)
 	{
+		
 		_velocity = Velocity;
-
+		_isOnFloor = IsOnFloor();
 		// Add the gravity.
 		if (!IsOnFloor()) {
 			_velocity += GetGravity() * (float)delta;
@@ -54,7 +78,11 @@ public partial class PlayerCharacter : CharacterBody2D
 
 		Velocity = _velocity;
 		MoveAndSlide();
-	}
+
+		// Death
+		HandleDeath();
+
+    }
 
 	private void HandleSpriteDirection() {
 
@@ -66,23 +94,104 @@ public partial class PlayerCharacter : CharacterBody2D
 		}
 	}
 
+	private void UpdateState() {
+        if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
+			_state = PlayerState.LongJump;
+        }
+        else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
+			_fallStartY = GlobalPosition.Y;
+            _state = PlayerState.Fall;
+        }
+        else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
+            _state = PlayerState.Walk;
+        }
+        else if (_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
+            _state = PlayerState.Run;
+        }
+        else if (_velocity.X == 0 && _isOnFloor) {
+            _state = PlayerState.Idle;
+        }
+
+		// for death and other things related
+        if (_isDead) {
+			_state = PlayerState.Death;
+        }
+    }
+
 	private void HandleAnimation() {
-		_isOnFloor = IsOnFloor();
-        
-		if (!_isOnFloor && _animatedSprite.Animation != "fall") {
-			_animatedSprite.Play("fall");
+
+		switch (_state) {
+			case PlayerState.Idle:
+                PlayAnim("idle");
+				Speed = BaseSpeed;
+				break;
+
+			case PlayerState.Walk:
+                PlayAnim("walk");
+				Speed = BaseSpeed;
+				break;
+
+			case PlayerState.Run:
+                PlayAnim("run");
+				Speed = Sprint;
+				break;
+
+			case PlayerState.Jump:
+                PlayAnim("jump");
+				break;
+
+			case PlayerState.LongJump:
+                PlayAnim("longJump");
+				break;
+
+			case PlayerState.Fall:
+                PlayAnim("fall");
+				break;
+
+			case PlayerState.DeadHang:
+                PlayAnim("deadHang");
+				break;
+
+			case PlayerState.CatHang:
+                PlayAnim("catHang");
+				break;
+
+			case PlayerState.Death:
+                PlayAnim("death");
+                Velocity = Vector2.Zero;
+                Speed = 0;
+				Die();
+                break;
+
 		}
-		else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
-			_animatedSprite.Play("walk");
-			Speed = BaseSpeed;
-		}
-		else if (_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
-			_animatedSprite.Play("run");
-			Speed = Sprint;
-		}
-		else if (_velocity.X == 0 && _isOnFloor) {
-			_animatedSprite.Play("idle");
-			Speed = BaseSpeed;
-		}
+		
 	}
+	private void Die() {
+        GetTree().CreateTimer(1.0f).Timeout += () => RestartLevel();
+    }
+    private void PlayAnim(string animName) {
+        if (_currentAnim != animName) {
+            _animatedSprite.Play(animName);
+            _currentAnim = animName;
+        }
+    }
+	 private void HandleDeath() {
+        if (!_wasOnFloor && _isOnFloor) {
+            float fallDistance = GlobalPosition.Y - _fallStartY;
+
+            if (fallDistance > _fallDistanceThreshold) {
+                _isDead = true;
+
+            }
+
+        }
+        if (_wasOnFloor && !_isOnFloor) {
+            _fallStartY = GlobalPosition.Y;
+        }
+        _wasOnFloor = _isOnFloor;
+    }
+    private void RestartLevel() {
+        var currentScene = GetTree().CurrentScene;
+        GetTree().ReloadCurrentScene(); // Shortcut in Godot 4.2+
+    }
 }
