@@ -19,7 +19,7 @@ For practicing Godot
 
 
 - Coding Jump
-- Coding Death
+- ~~Coding Death~~
 - Coding Hang
 
 
