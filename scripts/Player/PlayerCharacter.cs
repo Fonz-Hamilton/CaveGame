@@ -26,6 +26,8 @@ public partial class PlayerCharacter : CharacterBody2D
     }
 
     private AnimatedSprite2D _animatedSprite;
+	private RayCast2D _ledgeDetection;
+	private CollisionShape2D _collisionShape;
 	private Vector2 _direction;
 	private Vector2 _velocity;
 	
@@ -36,13 +38,18 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private float _fallStartY = 0;
     private float _fallDistanceThreshold = 200f;
-    private bool _wasOnFloor = false;
+    private bool _wasOnFloor = false;				// tracks if previous frame was on floor
 	private bool _isDead = false;
-
+	private Vector2 _ledgeDetectPos;
+	private Vector2 _collisionShapePos;
 
 
     public override void _Ready() {
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		_ledgeDetection = GetNode<RayCast2D>("RayLedgeCheck");
+		_collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
+		_ledgeDetectPos = _ledgeDetection.Position;
+		_collisionShapePos = _collisionShape.Position;
     }
 
     public override void _Process(double delta) {
@@ -79,8 +86,16 @@ public partial class PlayerCharacter : CharacterBody2D
 		Velocity = _velocity;
 		MoveAndSlide();
 
+		// Raycast bullshit
+		if(_ledgeDetection.IsColliding()) {
+			
+			
+			
+			
+		}
+
 		// Death
-		HandleDeath();
+		HandleFallDeath();
 
     }
 
@@ -88,10 +103,20 @@ public partial class PlayerCharacter : CharacterBody2D
 
 		if(_direction.X > 0) {
 			_animatedSprite.FlipH = false;
-		}
+			
+			_ledgeDetection.Position = _ledgeDetectPos;
+            _ledgeDetection.RotationDegrees = 0f;
+
+			_collisionShape.Position = _collisionShapePos;
+        }
 		else if (_direction.X < 0) {
 			_animatedSprite.FlipH = true;
-		}
+			
+			_ledgeDetection.Position = _ledgeDetectPos * (new Vector2(-1,1));
+			_ledgeDetection.RotationDegrees = 180f;
+
+            _collisionShape.Position = _collisionShapePos * (new Vector2(-1,1));
+        }
 	}
 
 	private void UpdateState() {
@@ -175,7 +200,7 @@ public partial class PlayerCharacter : CharacterBody2D
             _currentAnim = animName;
         }
     }
-	 private void HandleDeath() {
+	 private void HandleFallDeath() {
         if (!_wasOnFloor && _isOnFloor) {
             float fallDistance = GlobalPosition.Y - _fallStartY;
 
@@ -188,6 +213,7 @@ public partial class PlayerCharacter : CharacterBody2D
         if (_wasOnFloor && !_isOnFloor) {
             _fallStartY = GlobalPosition.Y;
         }
+		// update 'previous frame' floor state for use in next frame
         _wasOnFloor = _isOnFloor;
     }
     private void RestartLevel() {
