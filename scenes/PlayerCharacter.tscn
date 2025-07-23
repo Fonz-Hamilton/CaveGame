@@ -529,6 +529,14 @@ autoplay = "idle"
 position = Vector2(-0.5, 2)
 shape = SubResource("RectangleShape2D_24f1h")
 
-[node name="RayLedgeCheck" type="RayCast2D" parent="."]
-position = Vector2(8, -17)
-target_position = Vector2(4, 0)
+[node name="RayLedgeCheckTop" type="RayCast2D" parent="."]
+position = Vector2(7, -17)
+target_position = Vector2(6, 0)
+
+[node name="RayLedgeCheckMiddle" type="RayCast2D" parent="."]
+position = Vector2(7, -6)
+target_position = Vector2(6, 0)
+
+[node name="RayLedgeCheckClearance" type="RayCast2D" parent="."]
+position = Vector2(7, -22)
+target_position = Vector2(8, 0)

@@ -12,6 +12,8 @@ public partial class PlayerCharacter : CharacterBody2D
 	public float JumpVelocity = -400.0f;
     [Export]
     public float Speed = 75.0f;
+	[Export]
+	public Vector2 Gravity = new Vector2(0, 980);
 
     enum PlayerState {
         Idle,
@@ -26,8 +28,10 @@ public partial class PlayerCharacter : CharacterBody2D
     }
 
     private AnimatedSprite2D _animatedSprite;
-	private RayCast2D _ledgeDetection;
-	private CollisionShape2D _collisionShape;
+	private RayCast2D _ledgeDetectionTop;			// for dead hang
+    private RayCast2D _ledgeDetectionMiddle;		// for cat hang
+    private RayCast2D _ledgeDetectionClearance;
+    private CollisionShape2D _collisionShape;
 	private Vector2 _direction;
 	private Vector2 _velocity;
 	
@@ -40,32 +44,53 @@ public partial class PlayerCharacter : CharacterBody2D
     private float _fallDistanceThreshold = 200f;
     private bool _wasOnFloor = false;				// tracks if previous frame was on floor
 	private bool _isDead = false;
-	private Vector2 _ledgeDetectPos;
-	private Vector2 _collisionShapePos;
+	private Vector2 _ledgeDetectionTopPos;				// for dead hang inspector position
+    private Vector2 _ledgeDetectionMiddlePos;		// for cat hang inspector position
+	private Vector2 _ledgeDetectionClearancePos;
+    private Vector2 _collisionShapePos;
+	private Vector2 _vectorFlip =  new Vector2(-1, 1);
 
 
     public override void _Ready() {
+		// Animation
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-		_ledgeDetection = GetNode<RayCast2D>("RayLedgeCheck");
-		_collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
-		_ledgeDetectPos = _ledgeDetection.Position;
+
+		Gravity = new Vector2(0, 980);
+
+        // Basic raycast nodes
+        _ledgeDetectionTop = GetNode<RayCast2D>("RayLedgeCheckTop");
+		_ledgeDetectionMiddle = GetNode<RayCast2D>("RayLedgeCheckMiddle");
+        _ledgeDetectionClearance = GetNode<RayCast2D>("RayLedgeCheckClearance");
+
+        // Collisions
+        _collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
+
+		// at start, get the position of the nodes to make editing easier
+		_ledgeDetectionTopPos = _ledgeDetectionTop.Position;
+		_ledgeDetectionMiddlePos = _ledgeDetectionMiddle.Position;
+		_ledgeDetectionClearancePos = _ledgeDetectionClearance.Position;
+
 		_collisionShapePos = _collisionShape.Position;
     }
 
     public override void _Process(double delta) {
 		HandleSpriteDirection();
-		UpdateState();
-		HandleAnimation();
+        
+        HandleAnimation();
 		
     }
 	public override void _PhysicsProcess(double delta)
 	{
-		
-		_velocity = Velocity;
+        
+        _velocity = Velocity;
 		_isOnFloor = IsOnFloor();
-		// Add the gravity.
-		if (!IsOnFloor()) {
+        UpdateState();
+
+        // Add the gravity.
+        if (!IsOnFloor()) {
 			_velocity += GetGravity() * (float)delta;
+			//GD.Print("gravity: " + GetGravity().ToString());
+			GD.Print("gravity: " + Gravity.ToString());
 		}
 
 		// Handle Jump.
@@ -87,7 +112,7 @@ public partial class PlayerCharacter : CharacterBody2D
 		MoveAndSlide();
 
 		// Raycast bullshit
-		if(_ledgeDetection.IsColliding()) {
+		if(_ledgeDetectionTop.IsColliding()) {
 			
 			
 			
@@ -96,7 +121,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
 		// Death
 		HandleFallDeath();
-
+        
     }
 
 	private void HandleSpriteDirection() {
@@ -104,42 +129,72 @@ public partial class PlayerCharacter : CharacterBody2D
 		if(_direction.X > 0) {
 			_animatedSprite.FlipH = false;
 			
-			_ledgeDetection.Position = _ledgeDetectPos;
-            _ledgeDetection.RotationDegrees = 0f;
+			// raycast flip right
+			_ledgeDetectionTop.Position = _ledgeDetectionTopPos;
+            _ledgeDetectionTop.RotationDegrees = 0f;
 
-			_collisionShape.Position = _collisionShapePos;
+			_ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos;
+            _ledgeDetectionMiddle.RotationDegrees = 0f;
+
+			_ledgeDetectionClearance.Position = _ledgeDetectionClearancePos;
+			_ledgeDetectionClearance.RotationDegrees = 0f;
+
+            // collision box flip right
+            _collisionShape.Position = _collisionShapePos;
         }
 		else if (_direction.X < 0) {
 			_animatedSprite.FlipH = true;
 			
-			_ledgeDetection.Position = _ledgeDetectPos * (new Vector2(-1,1));
-			_ledgeDetection.RotationDegrees = 180f;
+			// raycast flip left
+			_ledgeDetectionTop.Position = _ledgeDetectionTopPos * _vectorFlip;
+			_ledgeDetectionTop.RotationDegrees = 180f;
 
+            _ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos * _vectorFlip;
+            _ledgeDetectionMiddle.RotationDegrees = 180f;
+
+            _ledgeDetectionClearance.Position = _ledgeDetectionClearancePos * _vectorFlip;
+            _ledgeDetectionClearance.RotationDegrees = 180f;
+
+            // collision box flipt right
             _collisionShape.Position = _collisionShapePos * (new Vector2(-1,1));
         }
 	}
 
 	private void UpdateState() {
-        if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
+		if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
 			_state = PlayerState.LongJump;
-        }
-        else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
+		}
+		else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
 			_fallStartY = GlobalPosition.Y;
-            _state = PlayerState.Fall;
+			_state = PlayerState.Fall;
+		}
+		else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
+			_state = PlayerState.Walk;
+            Speed = BaseSpeed;
         }
-        else if (_velocity.X != 0 && _isOnFloor && !Input.IsKeyPressed(Key.Shift)) {
-            _state = PlayerState.Walk;
+		else if (_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
+			_state = PlayerState.Run;
+            Speed = Sprint;
         }
-        else if (_velocity.X != 0 && _isOnFloor && Input.IsKeyPressed(Key.Shift)) {
-            _state = PlayerState.Run;
+		else if (_velocity.X == 0 && _isOnFloor) {
+			_state = PlayerState.Idle;
+            Speed = BaseSpeed;
         }
-        else if (_velocity.X == 0 && _isOnFloor) {
-            _state = PlayerState.Idle;
+		
+		else if (!_isOnFloor && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
+			_state = PlayerState.DeadHang;
+            _velocity = Vector2.Zero;
+			Speed = 0;
+			Gravity = Vector2.Zero;
         }
+		
 
 		// for death and other things related
-        if (_isDead) {
+		if (_isDead) {
 			_state = PlayerState.Death;
+            Velocity = Vector2.Zero;
+            Speed = 0;
+            Die();
         }
     }
 
@@ -148,17 +203,14 @@ public partial class PlayerCharacter : CharacterBody2D
 		switch (_state) {
 			case PlayerState.Idle:
                 PlayAnim("idle");
-				Speed = BaseSpeed;
 				break;
 
 			case PlayerState.Walk:
                 PlayAnim("walk");
-				Speed = BaseSpeed;
 				break;
 
 			case PlayerState.Run:
                 PlayAnim("run");
-				Speed = Sprint;
 				break;
 
 			case PlayerState.Jump:
@@ -175,7 +227,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
 			case PlayerState.DeadHang:
                 PlayAnim("deadHang");
-				break;
+                break;
 
 			case PlayerState.CatHang:
                 PlayAnim("catHang");
@@ -183,9 +235,6 @@ public partial class PlayerCharacter : CharacterBody2D
 
 			case PlayerState.Death:
                 PlayAnim("death");
-                Velocity = Vector2.Zero;
-                Speed = 0;
-				Die();
                 break;
 
 		}
@@ -194,6 +243,7 @@ public partial class PlayerCharacter : CharacterBody2D
 	private void Die() {
         GetTree().CreateTimer(1.0f).Timeout += () => RestartLevel();
     }
+
     private void PlayAnim(string animName) {
         if (_currentAnim != animName) {
             _animatedSprite.Play(animName);
