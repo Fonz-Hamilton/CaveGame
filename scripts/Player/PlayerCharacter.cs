@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using static Godot.WebSocketPeer;
 
 public partial class PlayerCharacter : CharacterBody2D
 {
@@ -36,6 +37,7 @@ public partial class PlayerCharacter : CharacterBody2D
 	private Vector2 _velocity;
 	
 	private bool _isOnFloor;
+	private Vector2 _baseGravity = new Vector2(0, 980);
 
 	private PlayerState _state = PlayerState.Idle;
 	private String _currentAnim = "";
@@ -55,7 +57,7 @@ public partial class PlayerCharacter : CharacterBody2D
 		// Animation
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 
-		Gravity = new Vector2(0, 980);
+		Gravity = _baseGravity;
 
         // Basic raycast nodes
         _ledgeDetectionTop = GetNode<RayCast2D>("RayLedgeCheckTop");
@@ -77,6 +79,7 @@ public partial class PlayerCharacter : CharacterBody2D
 		HandleSpriteDirection();
         
         HandleAnimation();
+		GD.Print("State: " + _state.ToString());
 		
     }
 	public override void _PhysicsProcess(double delta)
@@ -88,7 +91,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         // Add the gravity.
         if (!IsOnFloor()) {
-			_velocity += GetGravity() * (float)delta;
+			_velocity += Gravity * (float)delta;
 			//GD.Print("gravity: " + GetGravity().ToString());
 			GD.Print("gravity: " + Gravity.ToString());
 		}
@@ -164,7 +167,12 @@ public partial class PlayerCharacter : CharacterBody2D
 		if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
 			_state = PlayerState.LongJump;
 		}
-		else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
+        else if (!_isOnFloor && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
+            _state = PlayerState.DeadHang;
+			HandleLedgeGrab();
+            
+        }
+        else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
 			_fallStartY = GlobalPosition.Y;
 			_state = PlayerState.Fall;
 		}
@@ -181,12 +189,7 @@ public partial class PlayerCharacter : CharacterBody2D
             Speed = BaseSpeed;
         }
 		
-		else if (!_isOnFloor && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
-			_state = PlayerState.DeadHang;
-            _velocity = Vector2.Zero;
-			Speed = 0;
-			Gravity = Vector2.Zero;
-        }
+		
 		
 
 		// for death and other things related
@@ -266,6 +269,28 @@ public partial class PlayerCharacter : CharacterBody2D
 		// update 'previous frame' floor state for use in next frame
         _wasOnFloor = _isOnFloor;
     }
+
+	private void HandleLedgeGrab() {
+        _velocity = Vector2.Zero;
+        Speed = 0;
+        Gravity = Vector2.Zero;
+
+        if (Input.IsActionJustPressed("jump")) {
+            ClimbUp();					
+        }
+        else if (Input.IsActionJustPressed("move_down")) {
+            DropFromLedge();
+        }
+    }
+
+	private void DropFromLedge() {
+        Gravity = _baseGravity;
+        _state = PlayerState.Fall;
+    }
+
+	private void ClimbUp() {
+
+	}
     private void RestartLevel() {
         var currentScene = GetTree().CurrentScene;
         GetTree().ReloadCurrentScene(); // Shortcut in Godot 4.2+
