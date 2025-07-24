@@ -522,8 +522,9 @@ script = ExtResource("1_samq8")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "I wanna be the guy too!"
 sprite_frames = SubResource("SpriteFrames_24f1h")
-animation = &"Jump"
+animation = &"run"
 autoplay = "idle"
+offset = Vector2(0, 4.995)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 2)

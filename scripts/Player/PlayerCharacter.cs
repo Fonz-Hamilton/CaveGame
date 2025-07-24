@@ -57,7 +57,8 @@ public partial class PlayerCharacter : CharacterBody2D
     private Vector2 _ledgeDetectionMiddlePos;		// for cat hang inspector position
 	private Vector2 _ledgeDetectionClearancePos;
     private Vector2 _ledgeGrabPosition = Vector2.Zero;
-    private float _ledgeGrabExitDistance = 70f;
+    private float _ledgeGrabExitDistance = 10f;     // have moved far enough away to regrab
+    private float _pushDownVelocity = 10f;
     private bool _isOnLedge = false;
     private bool _canGrabLedge = false;
 
@@ -70,7 +71,7 @@ public partial class PlayerCharacter : CharacterBody2D
         _animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 
 		Gravity = _baseGravity;
-
+        
         // Basic raycast nodes
         _ledgeDetectionTop = GetNode<RayCast2D>("RayLedgeCheckTop");
 		_ledgeDetectionMiddle = GetNode<RayCast2D>("RayLedgeCheckMiddle");
@@ -91,8 +92,8 @@ public partial class PlayerCharacter : CharacterBody2D
 		HandleSpriteDirection();
         
         HandleAnimation();
-		
-		
+        GD.Print("distance between rays: " + (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y));
+
     }
 	public override void _PhysicsProcess(double delta)
 	{
@@ -183,6 +184,13 @@ public partial class PlayerCharacter : CharacterBody2D
             
             
         }
+        else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) {
+            _state = PlayerState.CatHang;
+            HandleLedgeGrab();
+            _ledgeGrabPosition = GlobalPosition;
+
+
+        }
         else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
 			_fallStartY = GlobalPosition.Y;
 			_state = PlayerState.Fall;
@@ -199,8 +207,6 @@ public partial class PlayerCharacter : CharacterBody2D
 			_state = PlayerState.Idle;
             Speed = BaseSpeed;
         }
-
-        
 
 
         // for death and other things related
@@ -301,10 +307,15 @@ public partial class PlayerCharacter : CharacterBody2D
         _state = PlayerState.Fall;
         _isOnLedge = false;
         _canGrabLedge = false;
-        _velocity.Y = 50; // Push the player downward a bit
+        _velocity.Y = _pushDownVelocity; // Push the player downward a bit
     }
 
 	private void ClimbUp() {
+        if(_state == PlayerState.DeadHang) {
+            _state = PlayerState.CatHang;
+            // Fix magic number
+            _velocity.Y = 21 * (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y);
+        }
 
 	}
     private void RestartLevel() {
