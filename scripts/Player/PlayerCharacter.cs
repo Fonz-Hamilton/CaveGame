@@ -44,6 +44,7 @@ public partial class PlayerCharacter : CharacterBody2D
     // state and animation
 	private PlayerState _state = PlayerState.Idle;
 	private String _currentAnim = "";
+    private Vector2 _collisionShapePos;
 
     // Death stuff
     private float _fallStartY = 0;
@@ -52,10 +53,11 @@ public partial class PlayerCharacter : CharacterBody2D
 	private bool _isDead = false;
 
     // ledge stuff
-	private Vector2 _ledgeDetectionTopPos;				// for dead hang inspector position
+	private Vector2 _ledgeDetectionTopPos;			// for dead hang inspector position
     private Vector2 _ledgeDetectionMiddlePos;		// for cat hang inspector position
 	private Vector2 _ledgeDetectionClearancePos;
-    private Vector2 _collisionShapePos;
+    private Vector2 _ledgeGrabPosition = Vector2.Zero;
+    private float _ledgeGrabExitDistance = 70f;
     private bool _isOnLedge = false;
     private bool _canGrabLedge = false;
 
@@ -101,7 +103,7 @@ public partial class PlayerCharacter : CharacterBody2D
         // Add the gravity.
         if (!IsOnFloor()) {
 			_velocity += Gravity * (float)delta;
-			//GD.Print("gravity: " + GetGravity().ToString());
+			
 			GD.Print("gravity: " + Gravity.ToString());
 		}
 
@@ -166,12 +168,19 @@ public partial class PlayerCharacter : CharacterBody2D
 	}
 
 	private void UpdateState() {
-		if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
+        float distanceFromLastLedge = GlobalPosition.DistanceTo(_ledgeGrabPosition);
+        if (!_canGrabLedge && distanceFromLastLedge > _ledgeGrabExitDistance) {
+            _canGrabLedge = true;
+            GD.Print("can crab ledge: " + _canGrabLedge);
+        }
+        if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
 			_state = PlayerState.LongJump;
 		}
-        else if (!_isOnFloor && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
+        else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
             _state = PlayerState.DeadHang;
 			HandleLedgeGrab();
+            _ledgeGrabPosition = GlobalPosition;
+            
             
         }
         else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
@@ -190,12 +199,12 @@ public partial class PlayerCharacter : CharacterBody2D
 			_state = PlayerState.Idle;
             Speed = BaseSpeed;
         }
-		
-		
-		
 
-		// for death and other things related
-		if (_isDead) {
+        
+
+
+        // for death and other things related
+        if (_isDead) {
 			_state = PlayerState.Death;
             Velocity = Vector2.Zero;
             Speed = 0;
@@ -291,6 +300,8 @@ public partial class PlayerCharacter : CharacterBody2D
         Gravity = _baseGravity;
         _state = PlayerState.Fall;
         _isOnLedge = false;
+        _canGrabLedge = false;
+        _velocity.Y = 50; // Push the player downward a bit
     }
 
 	private void ClimbUp() {
@@ -298,6 +309,6 @@ public partial class PlayerCharacter : CharacterBody2D
 	}
     private void RestartLevel() {
         var currentScene = GetTree().CurrentScene;
-        GetTree().ReloadCurrentScene(); // Shortcut in Godot 4.2+
+        GetTree().ReloadCurrentScene(); 
     }
 }
