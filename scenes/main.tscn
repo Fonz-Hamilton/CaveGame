@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://b1y64c01f5kh7" path="res://scenes/PlayerCharacter.tscn" id="1_o5qli"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o5qli"]
-size = Vector2(460.357, 9.4211)
+size = Vector2(458.806, 9.4211)
 
 [node name="Main" type="Node2D"]
 
@@ -205,7 +205,8 @@ points = PackedVector2Array(-176.128, 143.624, 65.0102, 144.345, 280.654, 144.34
 disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D16/StaticBody2D"]
-position = Vector2(52.5001, 144.187)
+position = Vector2(53.2756, 144.187)
+scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D17" type="Line2D" parent="."]

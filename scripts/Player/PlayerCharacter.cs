@@ -28,28 +28,38 @@ public partial class PlayerCharacter : CharacterBody2D
         Death
     }
 
+    // nodes
     private AnimatedSprite2D _animatedSprite;
 	private RayCast2D _ledgeDetectionTop;			// for dead hang
     private RayCast2D _ledgeDetectionMiddle;		// for cat hang
     private RayCast2D _ledgeDetectionClearance;
     private CollisionShape2D _collisionShape;
+
+    // movement
 	private Vector2 _direction;
 	private Vector2 _velocity;
-	
 	private bool _isOnFloor;
 	private Vector2 _baseGravity = new Vector2(0, 980);
 
+    // state and animation
 	private PlayerState _state = PlayerState.Idle;
 	private String _currentAnim = "";
 
+    // Death stuff
     private float _fallStartY = 0;
     private float _fallDistanceThreshold = 200f;
     private bool _wasOnFloor = false;				// tracks if previous frame was on floor
 	private bool _isDead = false;
+
+    // ledge stuff
 	private Vector2 _ledgeDetectionTopPos;				// for dead hang inspector position
     private Vector2 _ledgeDetectionMiddlePos;		// for cat hang inspector position
 	private Vector2 _ledgeDetectionClearancePos;
     private Vector2 _collisionShapePos;
+    private bool _isOnLedge = false;
+    private bool _canGrabLedge = false;
+
+    // misc helpers
 	private Vector2 _vectorFlip =  new Vector2(-1, 1);
 
 
@@ -79,16 +89,15 @@ public partial class PlayerCharacter : CharacterBody2D
 		HandleSpriteDirection();
         
         HandleAnimation();
-		GD.Print("State: " + _state.ToString());
+		
 		
     }
 	public override void _PhysicsProcess(double delta)
 	{
-        
         _velocity = Velocity;
 		_isOnFloor = IsOnFloor();
         UpdateState();
-
+        
         // Add the gravity.
         if (!IsOnFloor()) {
 			_velocity += Gravity * (float)delta;
@@ -114,13 +123,6 @@ public partial class PlayerCharacter : CharacterBody2D
 		Velocity = _velocity;
 		MoveAndSlide();
 
-		// Raycast bullshit
-		if(_ledgeDetectionTop.IsColliding()) {
-			
-			
-			
-			
-		}
 
 		// Death
 		HandleFallDeath();
@@ -129,7 +131,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
 	private void HandleSpriteDirection() {
 
-		if(_direction.X > 0) {
+		if(_direction.X > 0 && !_isOnLedge) {
 			_animatedSprite.FlipH = false;
 			
 			// raycast flip right
@@ -145,7 +147,7 @@ public partial class PlayerCharacter : CharacterBody2D
             // collision box flip right
             _collisionShape.Position = _collisionShapePos;
         }
-		else if (_direction.X < 0) {
+		else if (_direction.X < 0 && !_isOnLedge) {
 			_animatedSprite.FlipH = true;
 			
 			// raycast flip left
@@ -199,6 +201,7 @@ public partial class PlayerCharacter : CharacterBody2D
             Speed = 0;
             Die();
         }
+        GD.Print("State: " + _state.ToString());
     }
 
 	private void HandleAnimation() {
@@ -271,6 +274,7 @@ public partial class PlayerCharacter : CharacterBody2D
     }
 
 	private void HandleLedgeGrab() {
+        _isOnLedge = true;
         _velocity = Vector2.Zero;
         Speed = 0;
         Gravity = Vector2.Zero;
@@ -286,6 +290,7 @@ public partial class PlayerCharacter : CharacterBody2D
 	private void DropFromLedge() {
         Gravity = _baseGravity;
         _state = PlayerState.Fall;
+        _isOnLedge = false;
     }
 
 	private void ClimbUp() {
