@@ -92,7 +92,7 @@ public partial class PlayerCharacter : CharacterBody2D
 		HandleSpriteDirection();
         
         HandleAnimation();
-        GD.Print("distance between rays: " + (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y));
+        
 
     }
 	public override void _PhysicsProcess(double delta)
@@ -163,31 +163,33 @@ public partial class PlayerCharacter : CharacterBody2D
             _ledgeDetectionClearance.Position = _ledgeDetectionClearancePos * _vectorFlip;
             _ledgeDetectionClearance.RotationDegrees = 180f;
 
-            // collision box flipt right
-            _collisionShape.Position = _collisionShapePos * (new Vector2(-1,1));
+            // collision box flip right
+            _collisionShape.Position = _collisionShapePos * _vectorFlip;
         }
 	}
 
 	private void UpdateState() {
+        GD.Print("State Top: " + _state.ToString());
         float distanceFromLastLedge = GlobalPosition.DistanceTo(_ledgeGrabPosition);
+
         if (!_canGrabLedge && distanceFromLastLedge > _ledgeGrabExitDistance) {
             _canGrabLedge = true;
             GD.Print("can crab ledge: " + _canGrabLedge);
         }
-        if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0) {
+        if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0 && _state != PlayerState.Fall) {
 			_state = PlayerState.LongJump;
 		}
         else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
             _state = PlayerState.DeadHang;
 			HandleLedgeGrab();
-            _ledgeGrabPosition = GlobalPosition;
+            
             
             
         }
         else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) {
             _state = PlayerState.CatHang;
             HandleLedgeGrab();
-            _ledgeGrabPosition = GlobalPosition;
+            
 
 
         }
@@ -212,11 +214,10 @@ public partial class PlayerCharacter : CharacterBody2D
         // for death and other things related
         if (_isDead) {
 			_state = PlayerState.Death;
-            Velocity = Vector2.Zero;
-            Speed = 0;
+            
             Die();
         }
-        GD.Print("State: " + _state.ToString());
+        GD.Print("State Bottom: " + _state.ToString());
     }
 
 	private void HandleAnimation() {
@@ -262,6 +263,9 @@ public partial class PlayerCharacter : CharacterBody2D
 		
 	}
 	private void Die() {
+        Velocity = Vector2.Zero;
+        Speed = 0;
+        JumpVelocity = 0; 
         GetTree().CreateTimer(1.0f).Timeout += () => RestartLevel();
     }
 
@@ -271,6 +275,7 @@ public partial class PlayerCharacter : CharacterBody2D
             _currentAnim = animName;
         }
     }
+    
 	 private void HandleFallDeath() {
         if (!_wasOnFloor && _isOnFloor) {
             float fallDistance = GlobalPosition.Y - _fallStartY;
@@ -300,8 +305,10 @@ public partial class PlayerCharacter : CharacterBody2D
         else if (Input.IsActionJustPressed("move_down")) {
             DropFromLedge();
         }
+        _ledgeGrabPosition = GlobalPosition;
     }
 
+    // TODO: Change the state change to boolean flag
 	private void DropFromLedge() {
         Gravity = _baseGravity;
         _state = PlayerState.Fall;
@@ -310,7 +317,8 @@ public partial class PlayerCharacter : CharacterBody2D
         _velocity.Y = _pushDownVelocity; // Push the player downward a bit
     }
 
-	private void ClimbUp() {
+    // TODO: Change the state change to boolean flag
+    private void ClimbUp() {
         if(_state == PlayerState.DeadHang) {
             _state = PlayerState.CatHang;
             // Fix magic number

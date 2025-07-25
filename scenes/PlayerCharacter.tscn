@@ -521,23 +521,24 @@ script = ExtResource("1_samq8")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 editor_description = "I wanna be the guy too!"
+position = Vector2(18, 22)
 sprite_frames = SubResource("SpriteFrames_24f1h")
-animation = &"run"
+animation = &"walk"
 autoplay = "idle"
-offset = Vector2(0, 4.995)
+offset = Vector2(-17.885, -17.615)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, 2)
+position = Vector2(-0.5, 7)
 shape = SubResource("RectangleShape2D_24f1h")
 
 [node name="RayLedgeCheckTop" type="RayCast2D" parent="."]
-position = Vector2(7, -17)
+position = Vector2(7, -12)
 target_position = Vector2(6, 0)
 
 [node name="RayLedgeCheckMiddle" type="RayCast2D" parent="."]
-position = Vector2(7, -6)
+position = Vector2(7, -1)
 target_position = Vector2(6, 0)
 
 [node name="RayLedgeCheckClearance" type="RayCast2D" parent="."]
-position = Vector2(7, -22)
+position = Vector2(7, -17)
 target_position = Vector2(8, 0)

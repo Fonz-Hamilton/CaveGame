@@ -77,7 +77,7 @@ points = PackedVector2Array(-217, 144, 20, 144, 284, 143)
 disable_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D5/StaticBody2D"]
-position = Vector2(32.4515, 144)
+position = Vector2(32, 144)
 shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D6" type="Line2D" parent="."]
