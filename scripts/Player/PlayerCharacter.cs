@@ -151,41 +151,7 @@ public partial class PlayerCharacter : CharacterBody2D
         
     }
 
-	private void HandleSpriteDirection() {
-
-		if(_direction.X > 0 && !_isOnLedge && !_isDead) {
-			_animatedSprite.FlipH = false;
-			
-			// raycast flip right
-			_ledgeDetectionTop.Position = _ledgeDetectionTopPos;
-            _ledgeDetectionTop.RotationDegrees = 0f;
-
-			_ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos;
-            _ledgeDetectionMiddle.RotationDegrees = 0f;
-
-			_ledgeDetectionClearance.Position = _ledgeDetectionClearancePos;
-			_ledgeDetectionClearance.RotationDegrees = 0f;
-
-            // collision box flip right
-            _collisionShape.Position = _collisionShapePos;
-        }
-		else if (_direction.X < 0 && !_isOnLedge && !_isDead) {
-			_animatedSprite.FlipH = true;
-			
-			// raycast flip left
-			_ledgeDetectionTop.Position = _ledgeDetectionTopPos * _vectorFlip;
-			_ledgeDetectionTop.RotationDegrees = 180f;
-
-            _ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos * _vectorFlip;
-            _ledgeDetectionMiddle.RotationDegrees = 180f;
-
-            _ledgeDetectionClearance.Position = _ledgeDetectionClearancePos * _vectorFlip;
-            _ledgeDetectionClearance.RotationDegrees = 180f;
-
-            // collision box flip right
-            _collisionShape.Position = _collisionShapePos * _vectorFlip;
-        }
-	}
+	
 
 	private void UpdateState() {
         GD.Print("State Top: " + _state.ToString());
@@ -353,6 +319,42 @@ public partial class PlayerCharacter : CharacterBody2D
         }
 
 	}
+
+    private void HandleSpriteDirection() {
+
+        if (_direction.X > 0 && !_isOnLedge && !_isDead) {
+            _animatedSprite.FlipH = false;
+
+            // raycast flip right
+            _ledgeDetectionTop.Position = _ledgeDetectionTopPos;
+            _ledgeDetectionTop.RotationDegrees = 0f;
+
+            _ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos;
+            _ledgeDetectionMiddle.RotationDegrees = 0f;
+
+            _ledgeDetectionClearance.Position = _ledgeDetectionClearancePos;
+            _ledgeDetectionClearance.RotationDegrees = 0f;
+
+            // collision box flip right
+            _collisionShape.Position = _collisionShapePos;
+        }
+        else if (_direction.X < 0 && !_isOnLedge && !_isDead) {
+            _animatedSprite.FlipH = true;
+
+            // raycast flip left
+            _ledgeDetectionTop.Position = _ledgeDetectionTopPos * _vectorFlip;
+            _ledgeDetectionTop.RotationDegrees = 180f;
+
+            _ledgeDetectionMiddle.Position = _ledgeDetectionMiddlePos * _vectorFlip;
+            _ledgeDetectionMiddle.RotationDegrees = 180f;
+
+            _ledgeDetectionClearance.Position = _ledgeDetectionClearancePos * _vectorFlip;
+            _ledgeDetectionClearance.RotationDegrees = 180f;
+
+            // collision box flip right
+            _collisionShape.Position = _collisionShapePos * _vectorFlip;
+        }
+    }
     private void RestartLevel() {
         var currentScene = GetTree().CurrentScene;
         GetTree().ReloadCurrentScene(); 
