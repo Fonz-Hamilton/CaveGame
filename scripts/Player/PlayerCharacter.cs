@@ -154,7 +154,7 @@ public partial class PlayerCharacter : CharacterBody2D
 	
 
 	private void UpdateState() {
-        GD.Print("State Top: " + _state.ToString());
+        
         float distanceFromLastLedge = GlobalPosition.DistanceTo(_ledgeGrabPosition);
 
         if (!_canGrabLedge && distanceFromLastLedge > _ledgeGrabExitDistance) {
@@ -198,8 +198,8 @@ public partial class PlayerCharacter : CharacterBody2D
 
         // for death and other things related
         if (_isDead) {
-			_state = PlayerState.Death;
-            
+            _state = PlayerState.Death;
+
             Die();
         }
 
@@ -209,7 +209,7 @@ public partial class PlayerCharacter : CharacterBody2D
         _transitionToCatHang = false;
 
         // Debug State
-        GD.Print("State Bottom: " + _state.ToString());
+        GD.Print("State: " + _state.ToString());
     }
 
 	private void HandleAnimation() {
@@ -316,6 +316,15 @@ public partial class PlayerCharacter : CharacterBody2D
             // Fix magic number
             // will wait until tilemap is ready
             _velocity.Y = 21 * (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y);
+        }
+        else if(_state == PlayerState.CatHang) {
+            _transitionToCatHang = false;
+            _isOnLedge = false;
+            _velocity.Y = -400;
+            Gravity = _baseGravity;
+            Speed = BaseSpeed;
+            JumpVelocity = -400f;
+
         }
 
 	}
