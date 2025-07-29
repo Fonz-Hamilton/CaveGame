@@ -311,7 +311,7 @@ public partial class PlayerCharacter : CharacterBody2D
     // TODO: Change the state change to boolean flag
 	private void DropFromLedge() {
         Gravity = _baseGravity;
-        _state = PlayerState.Fall;
+        //_state = PlayerState.Fall;
         _isOnLedge = false;
         _canGrabLedge = false;
         _velocity.Y = _pushDownVelocity; // Push the player downward a bit

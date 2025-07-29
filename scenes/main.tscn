@@ -71,7 +71,7 @@ shape = SubResource("RectangleShape2D_o5qli")
 
 [node name="Line2D5" type="Line2D" parent="."]
 position = Vector2(1403, 532)
-points = PackedVector2Array(-217, 144, 20, 144, 284, 143)
+points = PackedVector2Array(-194, 144, 20, 144, 257, 143)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Line2D5"]
 disable_mode = 1
