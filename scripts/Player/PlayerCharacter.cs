@@ -61,6 +61,9 @@ public partial class PlayerCharacter : CharacterBody2D
     private float _pushDownVelocity = 10f;
     private bool _isOnLedge = false;
     private bool _canGrabLedge = false;
+    private bool _transitionToCatHang = false;
+    private bool _wantsToClimb = false;
+    private bool _wantsToDrop = false;
 
     // misc helpers
 	private Vector2 _vectorFlip =  new Vector2(-1, 1);
@@ -123,7 +126,21 @@ public partial class PlayerCharacter : CharacterBody2D
 			_velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
 		}
 
-		Velocity = _velocity;
+        // ledge stuff
+        if (Input.IsActionJustPressed("move_down")) {
+            _wantsToDrop = true;
+        }
+
+        if (Input.IsActionJustPressed("ui_up")) {
+            _wantsToClimb = true;
+        }
+
+        //if (SomeConditionToTransitionToCatHang()) {
+        //    _transitionToCatHang = true;
+        //}
+
+        // Motion
+        Velocity = _velocity;
 		MoveAndSlide();
 
 
@@ -134,7 +151,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
 	private void HandleSpriteDirection() {
 
-		if(_direction.X > 0 && !_isOnLedge) {
+		if(_direction.X > 0 && !_isOnLedge && !_isDead) {
 			_animatedSprite.FlipH = false;
 			
 			// raycast flip right
@@ -150,7 +167,7 @@ public partial class PlayerCharacter : CharacterBody2D
             // collision box flip right
             _collisionShape.Position = _collisionShapePos;
         }
-		else if (_direction.X < 0 && !_isOnLedge) {
+		else if (_direction.X < 0 && !_isOnLedge && !_isDead) {
 			_animatedSprite.FlipH = true;
 			
 			// raycast flip left
@@ -308,10 +325,10 @@ public partial class PlayerCharacter : CharacterBody2D
         _ledgeGrabPosition = GlobalPosition;
     }
 
-    // TODO: Change the state change to boolean flag
+    
 	private void DropFromLedge() {
         Gravity = _baseGravity;
-        //_state = PlayerState.Fall;
+        
         _isOnLedge = false;
         _canGrabLedge = false;
         _velocity.Y = _pushDownVelocity; // Push the player downward a bit
@@ -322,6 +339,7 @@ public partial class PlayerCharacter : CharacterBody2D
         if(_state == PlayerState.DeadHang) {
             _state = PlayerState.CatHang;
             // Fix magic number
+            // will wait until tilemap is ready
             _velocity.Y = 21 * (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y);
         }
 
