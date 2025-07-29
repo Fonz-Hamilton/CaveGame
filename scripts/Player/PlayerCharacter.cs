@@ -127,12 +127,14 @@ public partial class PlayerCharacter : CharacterBody2D
 		}
 
         // ledge stuff
-        if (Input.IsActionJustPressed("move_down")) {
+        if (Input.IsActionJustPressed("move_down") && !_isOnFloor) {
             _wantsToDrop = true;
+            GD.Print("wants to drop: " + _wantsToDrop);
         }
 
-        if (Input.IsActionJustPressed("ui_up")) {
+        if ((Input.IsActionJustPressed("move_up") || Input.IsActionJustPressed("jump")) && !_isOnFloor) {
             _wantsToClimb = true;
+            GD.Print("wants to climb: " + _wantsToClimb);
         }
 
         //if (SomeConditionToTransitionToCatHang()) {
@@ -203,7 +205,7 @@ public partial class PlayerCharacter : CharacterBody2D
             
             
         }
-        else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) {
+        else if ((!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) || _transitionToCatHang) {
             _state = PlayerState.CatHang;
             HandleLedgeGrab();
             
@@ -234,6 +236,13 @@ public partial class PlayerCharacter : CharacterBody2D
             
             Die();
         }
+
+        // states that need a refreshin'
+        _wantsToDrop = false;
+        _wantsToClimb = false;
+        _transitionToCatHang = false;
+
+        // Debug State
         GD.Print("State Bottom: " + _state.ToString());
     }
 
@@ -316,7 +325,7 @@ public partial class PlayerCharacter : CharacterBody2D
         Speed = 0;
         Gravity = Vector2.Zero;
 
-        if (Input.IsActionJustPressed("jump")) {
+        if (Input.IsActionJustPressed("jump") || Input.IsActionJustPressed("move_up")) {
             ClimbUp();					
         }
         else if (Input.IsActionJustPressed("move_down")) {
@@ -334,10 +343,10 @@ public partial class PlayerCharacter : CharacterBody2D
         _velocity.Y = _pushDownVelocity; // Push the player downward a bit
     }
 
-    // TODO: Change the state change to boolean flag
+    
     private void ClimbUp() {
         if(_state == PlayerState.DeadHang) {
-            _state = PlayerState.CatHang;
+            _transitionToCatHang = true;
             // Fix magic number
             // will wait until tilemap is ready
             _velocity.Y = 21 * (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y);
