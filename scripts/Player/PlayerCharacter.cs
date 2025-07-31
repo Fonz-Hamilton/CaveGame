@@ -103,7 +103,7 @@ public partial class PlayerCharacter : CharacterBody2D
         _velocity = Velocity;
 		_isOnFloor = IsOnFloor();
         UpdateState();
-        
+        GD.Print("after update state in PhysicsProcess");
         // Add the gravity.
         if (!IsOnFloor()) {
 			_velocity += Gravity * (float)delta;
@@ -143,18 +143,22 @@ public partial class PlayerCharacter : CharacterBody2D
 
         // Motion
         Velocity = _velocity;
+        GD.Print("before move and slide");
 		MoveAndSlide();
+        GD.Print("After move and slide");
 
 
 		// Death
 		HandleFallDeath();
-        
+
+        GD.Print("Speed: " + Speed);
     }
 
 	
 
 	private void UpdateState() {
-        
+        // Debug State
+        GD.Print("State: " + _state.ToString());
         float distanceFromLastLedge = GlobalPosition.DistanceTo(_ledgeGrabPosition);
 
         if (!_canGrabLedge && distanceFromLastLedge > _ledgeGrabExitDistance) {
@@ -167,15 +171,12 @@ public partial class PlayerCharacter : CharacterBody2D
         else if (!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && _ledgeDetectionTop.IsColliding()) {
             _state = PlayerState.DeadHang;
 			HandleLedgeGrab();
-            
-            
-            
+
         }
         else if ((!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) || _transitionToCatHang) {
             _state = PlayerState.CatHang;
+            GD.Print("inside the cathang else if");
             HandleLedgeGrab();
-            
-
 
         }
         else if (!_isOnFloor && (_animatedSprite.Animation != "fall" && _animatedSprite.Animation != "longJump")) {
@@ -207,9 +208,8 @@ public partial class PlayerCharacter : CharacterBody2D
         _wantsToDrop = false;
         _wantsToClimb = false;
         _transitionToCatHang = false;
-
-        // Debug State
-        GD.Print("State: " + _state.ToString());
+        GD.Print("end of inside of UpdateState()");
+        
     }
 
 	private void HandleAnimation() {
@@ -302,8 +302,8 @@ public partial class PlayerCharacter : CharacterBody2D
 
     
 	private void DropFromLedge() {
+        // Speed is reset in the walk and idle state so it doesnt need to be called here but I may depending
         Gravity = _baseGravity;
-        
         _isOnLedge = false;
         _canGrabLedge = false;
         _velocity.Y = _pushDownVelocity; // Push the player downward a bit
@@ -311,21 +311,29 @@ public partial class PlayerCharacter : CharacterBody2D
 
     
     private void ClimbUp() {
+        
         if(_state == PlayerState.DeadHang) {
             _transitionToCatHang = true;
             // Fix magic number
             // will wait until tilemap is ready
             _velocity.Y = 21 * (_ledgeDetectionTopPos.Y - _ledgeDetectionMiddlePos.Y);
         }
+        
         else if(_state == PlayerState.CatHang) {
-            _transitionToCatHang = false;
-            _isOnLedge = false;
-            _velocity.Y = -400;
+            
+            
             Gravity = _baseGravity;
             Speed = BaseSpeed;
             JumpVelocity = -400f;
-
+            _velocity.Y = -400;
+            
+            _canGrabLedge = false;
+            _isOnLedge = false;
+            
+            _transitionToCatHang = false;
+            GD.Print("end of cathang climb up");
         }
+        
 
 	}
 
@@ -333,7 +341,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         if (_direction.X > 0 && !_isOnLedge && !_isDead) {
             _animatedSprite.FlipH = false;
-
+            GD.Print("Flip right");
             // raycast flip right
             _ledgeDetectionTop.Position = _ledgeDetectionTopPos;
             _ledgeDetectionTop.RotationDegrees = 0f;
@@ -349,7 +357,7 @@ public partial class PlayerCharacter : CharacterBody2D
         }
         else if (_direction.X < 0 && !_isOnLedge && !_isDead) {
             _animatedSprite.FlipH = true;
-
+            GD.Print("Flip left");
             // raycast flip left
             _ledgeDetectionTop.Position = _ledgeDetectionTopPos * _vectorFlip;
             _ledgeDetectionTop.RotationDegrees = 180f;
@@ -369,3 +377,20 @@ public partial class PlayerCharacter : CharacterBody2D
         GetTree().ReloadCurrentScene(); 
     }
 }
+/*
+ * WILL LEAVE IN HERE IN CASE IT STILL HAPPENS. ADDING _canGrabLedge = false SEEMS TO FIX
+ * 
+ * Player state is in cat hang
+ * player moves up which makes onledge = false
+ * the _PhysicsProcess allows input and finishes
+ * if holding right still in state cathang but not on ledge
+ * _PhysicsProcess finishes with state still as cat hang
+ * _Process starts
+ * holding right flips player
+ * _PhysicsProcess starts
+ * Goes into UpdateState
+ * prints that its still cathang at the top of the function
+ * updates to Fall state
+ * Fall state does not reset anything so player is stuck falling
+ * eventually prints Fall as state when it wraps around to the top of UpdateState()
+ */
