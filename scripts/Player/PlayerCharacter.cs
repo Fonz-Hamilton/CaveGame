@@ -65,6 +65,10 @@ public partial class PlayerCharacter : CharacterBody2D
     private bool _wantsToClimb = false;
     private bool _wantsToDrop = false;
 
+    // wall kick stuff
+    private bool _wantsToWallKick = false;
+
+
     // misc helpers
 	private Vector2 _vectorFlip =  new Vector2(-1, 1);
 
@@ -103,7 +107,7 @@ public partial class PlayerCharacter : CharacterBody2D
         _velocity = Velocity;
 		_isOnFloor = IsOnFloor();
         UpdateState();
-        GD.Print("after update state in PhysicsProcess");
+        
         // Add the gravity.
         if (!IsOnFloor()) {
 			_velocity += Gravity * (float)delta;
@@ -129,32 +133,22 @@ public partial class PlayerCharacter : CharacterBody2D
         // ledge stuff
         if (Input.IsActionJustPressed("move_down") && !_isOnFloor) {
             _wantsToDrop = true;
-            GD.Print("wants to drop: " + _wantsToDrop);
+            
         }
 
         if ((Input.IsActionJustPressed("move_up") || Input.IsActionJustPressed("jump")) && !_isOnFloor) {
             _wantsToClimb = true;
-            GD.Print("wants to climb: " + _wantsToClimb);
+            
         }
-
-        //if (SomeConditionToTransitionToCatHang()) {
-        //    _transitionToCatHang = true;
-        //}
 
         // Motion
         Velocity = _velocity;
-        GD.Print("before move and slide");
 		MoveAndSlide();
-        GD.Print("After move and slide");
-
 
 		// Death
 		HandleFallDeath();
 
-        GD.Print("Speed: " + Speed);
     }
-
-	
 
 	private void UpdateState() {
         // Debug State
@@ -163,7 +157,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         if (!_canGrabLedge && distanceFromLastLedge > _ledgeGrabExitDistance) {
             _canGrabLedge = true;
-            GD.Print("can crab ledge: " + _canGrabLedge);
+            
         }
         if (Input.IsKeyPressed(Key.Shift) && Input.IsActionJustPressed("jump") && _velocity.X != 0 && _state != PlayerState.Fall) {
 			_state = PlayerState.LongJump;
@@ -175,7 +169,7 @@ public partial class PlayerCharacter : CharacterBody2D
         }
         else if ((!_isOnFloor && _canGrabLedge && !_ledgeDetectionClearance.IsColliding() && !_ledgeDetectionTop.IsColliding() &&_ledgeDetectionMiddle.IsColliding()) || _transitionToCatHang) {
             _state = PlayerState.CatHang;
-            GD.Print("inside the cathang else if");
+            
             HandleLedgeGrab();
 
         }
@@ -208,7 +202,7 @@ public partial class PlayerCharacter : CharacterBody2D
         _wantsToDrop = false;
         _wantsToClimb = false;
         _transitionToCatHang = false;
-        GD.Print("end of inside of UpdateState()");
+        
         
     }
 
@@ -331,7 +325,7 @@ public partial class PlayerCharacter : CharacterBody2D
             _isOnLedge = false;
             
             _transitionToCatHang = false;
-            GD.Print("end of cathang climb up");
+            
         }
         
 
@@ -341,7 +335,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         if (_direction.X > 0 && !_isOnLedge && !_isDead) {
             _animatedSprite.FlipH = false;
-            GD.Print("Flip right");
+            
             // raycast flip right
             _ledgeDetectionTop.Position = _ledgeDetectionTopPos;
             _ledgeDetectionTop.RotationDegrees = 0f;
@@ -357,7 +351,7 @@ public partial class PlayerCharacter : CharacterBody2D
         }
         else if (_direction.X < 0 && !_isOnLedge && !_isDead) {
             _animatedSprite.FlipH = true;
-            GD.Print("Flip left");
+            
             // raycast flip left
             _ledgeDetectionTop.Position = _ledgeDetectionTopPos * _vectorFlip;
             _ledgeDetectionTop.RotationDegrees = 180f;
